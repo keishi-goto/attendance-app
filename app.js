@@ -647,15 +647,18 @@ class UIController {
             }
         });
 
+        const startBrowserOnly = () => {
+            document.getElementById('modal-startup').classList.remove('active');
+            this.refreshAllViews();
+            this.storage.updateSyncStatus('disconnected');
+            this.showToast('ブラウザ保存モードで開始しました。データは定期的に出力してください。');
+        };
+
         const btnBrowserOnly = document.getElementById('btn-startup-browser-only');
-        if (btnBrowserOnly) {
-            btnBrowserOnly.addEventListener('click', () => {
-                document.getElementById('modal-startup').classList.remove('active');
-                this.refreshAllViews();
-                this.storage.updateSyncStatus('disconnected');
-                this.showToast('ブラウザ保存モードで開始しました。データは定期的に出力してください。');
-            });
-        }
+        if (btnBrowserOnly) btnBrowserOnly.addEventListener('click', startBrowserOnly);
+        
+        const btnBrowserOnlyMobile = document.getElementById('btn-startup-browser-only-mobile');
+        if (btnBrowserOnlyMobile) btnBrowserOnlyMobile.addEventListener('click', startBrowserOnly);
         
         // GitHub API Settings Modal Logic
         const openGitHubSettings = () => {
@@ -668,11 +671,23 @@ class UIController {
             document.getElementById('modal-github-settings').classList.add('active');
         };
 
+        const btnStartupGHSync = document.getElementById('btn-startup-github-sync-pc');
+        if (btnStartupGHSync) btnStartupGHSync.addEventListener('click', openGitHubSettings);
+        
+        const btnStartupGHCreate = document.getElementById('btn-startup-github-create-pc');
+        if (btnStartupGHCreate) btnStartupGHCreate.addEventListener('click', openGitHubSettings);
+        
+        const btnStartupGHSyncMobile = document.getElementById('btn-startup-github-sync-mobile');
+        if (btnStartupGHSyncMobile) btnStartupGHSyncMobile.addEventListener('click', openGitHubSettings);
+        
+        const btnStartupGHCreateMobile = document.getElementById('btn-startup-github-create-mobile');
+        if (btnStartupGHCreateMobile) btnStartupGHCreateMobile.addEventListener('click', openGitHubSettings);
+
         // Device Selection Flow
         document.getElementById('btn-startup-select-mobile').addEventListener('click', () => {
-            // Show settings explicitly for mobile
+            document.getElementById('startup-device-selection').style.display = 'none';
+            document.getElementById('startup-options-mobile').style.display = 'block';
             document.getElementById('nav-settings-mobile').style.display = 'flex';
-            openGitHubSettings();
         });
 
         document.getElementById('btn-startup-select-pc').addEventListener('click', () => {
@@ -683,6 +698,12 @@ class UIController {
 
         document.getElementById('btn-startup-back-to-device').addEventListener('click', () => {
             document.getElementById('startup-options-pc').style.display = 'none';
+            document.getElementById('startup-device-selection').style.display = 'block';
+            document.getElementById('startup-modal-title').textContent = '利用する端末の選択';
+        });
+
+        document.getElementById('btn-startup-back-to-device-mobile').addEventListener('click', () => {
+            document.getElementById('startup-options-mobile').style.display = 'none';
             document.getElementById('startup-device-selection').style.display = 'block';
             document.getElementById('startup-modal-title').textContent = '利用する端末の選択';
         });

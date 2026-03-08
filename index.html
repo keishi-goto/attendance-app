@@ -370,7 +370,21 @@
                     </div>
                 </div>
 
-                <!-- Screen 2: PC Local File Selection (Hidden by default) -->
+                <!-- Screen 2 (Mobile): Mobile Options -->
+                <div id="startup-options-mobile" style="display: none;">
+                    <h3 style="margin-bottom: 20px; color: var(--text-main);">スマートフォン用 設定</h3>
+                    <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.95rem;">
+                        クラウド(GitHub)を利用して出欠データを管理します。
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; margin-bottom: 24px;">
+                        <button type="button" class="btn btn-primary" id="btn-startup-github-sync-mobile" style="width: 100%; max-width: 300px;">☁️ クラウド連携を開始 (既存データ)</button>
+                        <button type="button" class="btn btn-outline" id="btn-startup-github-create-mobile" style="width: 100%; max-width: 300px;">☁️ 新規ファイルを作成...</button>
+                        <button type="button" class="btn btn-secondary" id="btn-startup-browser-only-mobile" style="width: 100%; max-width: 300px; margin-top: 12px; opacity: 0.7;">ブラウザのみで利用 (非推奨)</button>
+                    </div>
+                    <button type="button" class="btn btn-outline" id="btn-startup-back-to-device-mobile" style="border: none; text-decoration: underline;">← デバイス選択に戻る</button>
+                </div>
+
+                <!-- Screen 2 (PC): PC Local File Selection -->
                 <div id="startup-options-pc" style="display: none;">
                     <h3 style="margin-bottom: 20px; color: var(--text-main);">パソコン用 設定</h3>
                     
@@ -388,9 +402,11 @@
                         新しく選択・作成する場合は以下から選んでください。
                     </p>
                     <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; margin-bottom: 24px;">
-                        <button type="button" class="btn btn-outline" id="btn-startup-new" style="width: 100%; max-width: 300px;">📁 新規ファイルを作成...</button>
-                        <button type="button" class="btn btn-outline" id="btn-startup-open" style="width: 100%; max-width: 300px;">📂 既存ファイルを開く...</button>
-                        <button type="button" class="btn btn-secondary" id="btn-startup-github-sync-pc" style="width: 100%; max-width: 300px;">☁️ クラウド(GitHub)同期を利用</button>
+                        <button type="button" class="btn btn-outline" id="btn-startup-new" style="width: 100%; max-width: 300px;">📁 新規ファイルを作成 (ローカル保存)...</button>
+                        <button type="button" class="btn btn-outline" id="btn-startup-open" style="width: 100%; max-width: 300px;">📂 既存ファイルを開く (ローカル保存)...</button>
+                        <div style="width: 100%; max-width: 300px; height: 1px; background: var(--border-color); margin: 8px 0;"></div>
+                        <button type="button" class="btn btn-primary" id="btn-startup-github-sync-pc" style="width: 100%; max-width: 300px;">☁️ クラウド連携を開始 (既存データ)</button>
+                        <button type="button" class="btn btn-outline" id="btn-startup-github-create-pc" style="width: 100%; max-width: 300px;">☁️ 新規ファイルを作成 (クラウド連携)...</button>
                         <button type="button" class="btn btn-secondary" id="btn-startup-browser-only" style="width: 100%; max-width: 300px; margin-top: 12px; opacity: 0.7;">ブラウザのみで利用 (非推奨)</button>
                     </div>
                     
