@@ -315,7 +315,7 @@
     <div id="modal-startup" class="modal" style="background-color: var(--bg-color);">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="startup-modal-title">データファイルの選択</h2>
+                <h2 id="startup-modal-title">利用する端末の選択</h2>
                 <!-- No close button to force selection -->
             </div>
             <div class="modal-body" style="text-align: center; padding: 40px 20px;">
@@ -326,37 +326,48 @@
                     <p style="color: var(--text-muted);">クラウド(GitHub)から最新データを読み込んでいます</p>
                 </div>
                 
-                <div id="startup-options">
-                    <div id="startup-has-file" style="display: none;">
-                        <p style="margin-bottom: 20px; color: var(--text-muted);">
-                            前回同期していたファイルが見つかりました。<br>
-                            このファイルで同期を再開しますか？
+                <!-- Screen 1: Device Selection -->
+                <div id="startup-device-selection">
+                    <p style="margin-bottom: 24px; color: var(--text-muted); font-size: 1.1rem;">
+                        どちらの端末からアプリを利用しますか？
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 16px; align-items: center;">
+                        <button type="button" class="btn btn-primary" id="btn-startup-select-mobile" style="width: 100%; max-width: 320px; padding: 20px; font-size: 1.2rem;">
+                            📱 スマートフォンで利用
+                        </button>
+                        <button type="button" class="btn btn-outline" id="btn-startup-select-pc" style="width: 100%; max-width: 320px; padding: 16px; font-size: 1.1rem;">
+                            💻 パソコンで利用
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Screen 2: PC Local File Selection (Hidden by default) -->
+                <div id="startup-options-pc" style="display: none;">
+                    <h3 style="margin-bottom: 20px; color: var(--text-main);">パソコン用 設定</h3>
+                    
+                    <div id="startup-has-file" style="display: none; background: var(--table-hover-bg); padding: 16px; border-radius: var(--radius-md); margin-bottom: 24px;">
+                        <p style="margin-bottom: 12px; color: var(--text-muted);">
+                            前回同期していたファイルで再開しますか？
                         </p>
-                        <div
-                            style="font-weight: 600; font-size: 1.1rem; color: var(--primary-color); padding: 12px; background: var(--table-hover-bg); border-radius: var(--radius-md); display: inline-block; margin-bottom: 24px;">
+                        <div style="font-weight: 600; font-size: 1.1rem; color: var(--primary-color); margin-bottom: 16px;">
                             📄 <span id="startup-filename-text">filename.json</span>
                         </div>
-                        <div style="display: flex; justify-content: center; gap: 16px;">
-                            <button type="button" class="btn btn-primary" id="btn-startup-resume">はい、再開する</button>
-                        </div>
-                        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 24px 0;">
+                        <button type="button" class="btn btn-primary" id="btn-startup-resume" style="width: 100%; max-width: 200px;">はい、再開する</button>
                     </div>
-                </div>
 
-                <div id="startup-options-bottom">
-                    <p style="margin-bottom: 20px; color: var(--text-muted);" id="startup-desc-text">
-                        データの保存先（JSONファイル）を選択してください。<br>
-                        <small>※ブラウザ上だけでの作業はデータ消失のリスクがあるため推奨していませんが、<br>スマホ等の環境では「クラウド（GitHub）と同期」または「ブラウザのみで利用」を選択してください。</small>
+                    <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.95rem;">
+                        新しく選択・作成する場合は以下から選んでください。
                     </p>
-                    <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
-                        <button type="button" class="btn btn-outline" id="btn-startup-new">新規ファイルを作成...</button>
-                        <button type="button" class="btn btn-outline" id="btn-startup-open">既存ファイルを開く...</button>
-                        <button type="button" class="btn btn-primary" id="btn-startup-github-sync">☁️ クラウド（GitHub）と同期</button>
-                        <button type="button" class="btn btn-secondary" id="btn-startup-browser-only">ブラウザのみで利用（同期なし）</button>
+                    <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; margin-bottom: 24px;">
+                        <button type="button" class="btn btn-outline" id="btn-startup-new" style="width: 100%; max-width: 300px;">📁 新規ファイルを作成...</button>
+                        <button type="button" class="btn btn-outline" id="btn-startup-open" style="width: 100%; max-width: 300px;">📂 既存ファイルを開く...</button>
+                        <button type="button" class="btn btn-secondary" id="btn-startup-github-sync-pc" style="width: 100%; max-width: 300px;">☁️ クラウド(GitHub)同期を利用</button>
+                        <button type="button" class="btn btn-secondary" id="btn-startup-browser-only" style="width: 100%; max-width: 300px; margin-top: 12px; opacity: 0.7;">ブラウザのみで利用 (非推奨)</button>
                     </div>
-
-                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 24px 0;">
+                    
+                    <button type="button" class="btn btn-outline" id="btn-startup-back-to-device" style="border: none; text-decoration: underline;">← デバイス選択に戻る</button>
                 </div>
+                
             </div>
         </div>
     </div>

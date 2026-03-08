@@ -500,10 +500,11 @@ class UIController {
         const storedHandle = await this.storage.loadStoredFileHandle();
         const startupModal = document.getElementById('modal-startup');
         
+        // Auto-login logic
         if (this.storage.ghSettings.enabled && this.storage.ghSettings.token) {
             // Setup Loading UI
-            document.getElementById('startup-options').style.display = 'none';
-            document.getElementById('startup-options-bottom').style.display = 'none';
+            document.getElementById('startup-device-selection').style.display = 'none';
+            document.getElementById('startup-options-pc').style.display = 'none';
             document.getElementById('startup-loading').style.display = 'block';
             document.getElementById('startup-modal-title').textContent = 'クラウド同期';
             startupModal.classList.add('active');
@@ -514,20 +515,25 @@ class UIController {
                 this.showToast('GitHubからデータを同期しました');
             } else {
                 // Restore UI if failed
-                document.getElementById('startup-options').style.display = 'block';
-                document.getElementById('startup-options-bottom').style.display = 'block';
+                document.getElementById('startup-device-selection').style.display = 'block';
+                document.getElementById('startup-options-pc').style.display = 'none';
                 document.getElementById('startup-loading').style.display = 'none';
-                document.getElementById('startup-modal-title').textContent = 'データファイルの選択';
+                document.getElementById('startup-modal-title').textContent = '利用する端末の選択';
                 alert('GitHubからのデータ取得に失敗しました。設定を確認してください。');
                 this.storage.saveGitHubSettings({ enabled: false });
             }
-        } else if (storedHandle) {
-            document.getElementById('startup-has-file').style.display = 'block';
-            document.getElementById('startup-filename-text').textContent = storedHandle.name;
-            startupModal.classList.add('active');
         } else {
-            document.getElementById('startup-has-file').style.display = 'none';
+            // Show device selection if no auto-login
+            document.getElementById('startup-device-selection').style.display = 'block';
+            document.getElementById('startup-options-pc').style.display = 'none';
             startupModal.classList.add('active');
+            
+            if (storedHandle) {
+                document.getElementById('startup-has-file').style.display = 'block';
+                document.getElementById('startup-filename-text').textContent = storedHandle.name;
+            } else {
+                document.getElementById('startup-has-file').style.display = 'none';
+            }
         }
     }
 
@@ -678,9 +684,28 @@ class UIController {
             document.getElementById('modal-github-settings').classList.add('active');
         };
 
-        const btnStartupGithub = document.getElementById('btn-startup-github-sync');
-        if (btnStartupGithub) {
-            btnStartupGithub.addEventListener('click', openGitHubSettings);
+        // Device Selection Flow
+        document.getElementById('btn-startup-select-mobile').addEventListener('click', () => {
+            // Show settings explicitly for mobile
+            document.getElementById('nav-settings-mobile').style.display = 'flex';
+            openGitHubSettings();
+        });
+
+        document.getElementById('btn-startup-select-pc').addEventListener('click', () => {
+            document.getElementById('startup-device-selection').style.display = 'none';
+            document.getElementById('startup-options-pc').style.display = 'block';
+            document.getElementById('startup-modal-title').textContent = '💻 パソコン用設定';
+        });
+
+        document.getElementById('btn-startup-back-to-device').addEventListener('click', () => {
+            document.getElementById('startup-options-pc').style.display = 'none';
+            document.getElementById('startup-device-selection').style.display = 'block';
+            document.getElementById('startup-modal-title').textContent = '利用する端末の選択';
+        });
+
+        const btnStartupGithubPc = document.getElementById('btn-startup-github-sync-pc');
+        if (btnStartupGithubPc) {
+            btnStartupGithubPc.addEventListener('click', openGitHubSettings);
         }
         
         // Mobile settings view buttons
