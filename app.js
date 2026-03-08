@@ -933,8 +933,50 @@ class UIController {
                     return;
                 }
                 
-                // Create a workbook and add the table as a worksheet
+                // Create a workbook and add the table as a worksheet (Sheet 1: Summary)
                 const wb = XLSX.utils.table_to_book(table, { sheet: "出欠一覧" });
+                
+                // --- Sheet 2: Detailed Records Matrix ---
+                const classId = document.getElementById('summary-class-select').value;
+                const cls = this.storage.data.classes.find(c => c.id === classId);
+                
+                if (cls) {
+                    const startStr = document.getElementById('summary-start-date').value;
+                    const endStr = document.getElementById('summary-end-date').value;
+                    const students = [...cls.students].sort((a, b) => a.number - b.number);
+                    
+                    // Create the header row
+                    const headerRow = ['日付', '時限'];
+                    students.forEach(s => headerRow.push(s.name));
+                    
+                    const matrixData = [headerRow];
+                    
+                    // Find all target dates and periods for this class
+                    const targetDates = Object.keys(this.storage.data.attendance).filter(d => d >= startStr && d <= endStr).sort();
+                    
+                    targetDates.forEach(date => {
+                        const dailyData = this.storage.data.attendance[date];
+                        Object.keys(dailyData).forEach(period => {
+                            const periodData = dailyData[period];
+                            if (periodData.classId === classId) {
+                                // Create a row for this date/period
+                                const row = [date, period];
+                                const records = periodData.records || {};
+                                
+                                students.forEach(s => {
+                                    const status = records[s.id];
+                                    row.push(status ? status : ''); // Leave blank if no record
+                                });
+                                
+                                matrixData.push(row);
+                            }
+                        });
+                    });
+                    
+                    // Add the second sheet to the workbook
+                    const ws2 = XLSX.utils.aoa_to_sheet(matrixData);
+                    XLSX.utils.book_append_sheet(wb, ws2, "詳細記録");
+                }
                 
                 // Construct a filename with today's date
                 const today = new Date();
@@ -1240,30 +1282,34 @@ class UIController {
             const isExcluded = student.status === STUDENT_STATUS.TRANSFER || student.status === STUDENT_STATUS.DROPOUT;
 
             let optionsHtml = '';
-            if (isExcluded) {
-                // 入力不可とする
-                tr.classList.add('row-disabled');
-                optionsHtml = `<span class="excluded-label">出欠確認の対象外です</span>`;
-            } else {
-                hasInputtable = true;
+            hasInputtable = true; // All rows are technically inputtable now
 
-                // 長期欠席の場合はデフォルトを欠席にする。それ以外は出席か、既存データ。
-                let defaultVal = ATTENDANCE_TYPES.PRESENT;
-                if (student.status === STUDENT_STATUS.LONG_ABSENT) {
-                    defaultVal = ATTENDANCE_TYPES.ABSENT;
+            // 既存データの取得
+            let currentStatus = existingRecords[student.id];
+
+            // 既存データがない場合（新規作成時など）のデフォルト値設定
+            if (!currentStatus) {
+                if (isExcluded) {
+                    // 退学・移行・（追加前）の生徒はデフォルトを空欄（選択なし）にする
+                    currentStatus = null;
+                } else if (student.status === STUDENT_STATUS.LONG_ABSENT) {
+                    // 長期欠席の生徒はデフォルトを欠席にする
+                    currentStatus = ATTENDANCE_TYPES.ABSENT;
+                } else {
+                    // 通常の生徒はデフォルトを出席にする
+                    currentStatus = ATTENDANCE_TYPES.PRESENT;
                 }
-                const currentStatus = existingRecords[student.id] || defaultVal;
-
-                optionsHtml = '<div class="attendance-options">';
-                Object.values(ATTENDANCE_TYPES).forEach(type => {
-                    const isChecked = currentStatus === type ? 'checked' : '';
-                    optionsHtml += `
-                        <input type="radio" name="att_edit_${student.id}" id="att_edit_${student.id}_${type}" value="${type}" class="attendance-radio" ${isChecked}>
-                        <label for="att_edit_${student.id}_${type}" class="attendance-label" data-type="${type}">${type}</label>
-                    `;
-                });
-                optionsHtml += '</div>';
             }
+
+            optionsHtml = '<div class="attendance-options">';
+            Object.values(ATTENDANCE_TYPES).forEach(type => {
+                const isChecked = currentStatus === type ? 'checked' : '';
+                optionsHtml += `
+                    <input type="radio" name="att_edit_${student.id}" id="att_edit_${student.id}_${type}" value="${type}" class="attendance-radio" ${isChecked}>
+                    <label for="att_edit_${student.id}_${type}" class="attendance-label" data-type="${type}">${type}</label>
+                `;
+            });
+            optionsHtml += '</div>';
 
             tr.innerHTML = `
                 <td>${student.number}</td>
@@ -1310,13 +1356,10 @@ class UIController {
         let savedCount = 0;
 
         cls.students.forEach(student => {
-            const isExcluded = student.status === STUDENT_STATUS.TRANSFER || student.status === STUDENT_STATUS.DROPOUT;
-            if (!isExcluded) {
-                const selected = document.querySelector(`input[name="att_edit_${student.id}"]:checked`);
-                if (selected) {
-                    records[student.id] = selected.value;
-                    savedCount++;
-                }
+            const selected = document.querySelector(`input[name="att_edit_${student.id}"]:checked`);
+            if (selected) {
+                records[student.id] = selected.value;
+                savedCount++;
             }
         });
 
