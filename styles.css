@@ -498,38 +498,15 @@ select:focus {
     background-color: var(--table-hover-bg);
 }
 
-/* Labels to visually distinguish class periods */
-.attendance-badge[data-period="1限"] {
-    border-left: 3px solid #f87171;
-}
-
-.attendance-badge[data-period="2限"] {
-    border-left: 3px solid #fb923c;
-}
-
-.attendance-badge[data-period="3限"] {
-    border-left: 3px solid #fbbf24;
-}
-
-.attendance-badge[data-period="4限"] {
-    border-left: 3px solid #a3e635;
-}
-
-.attendance-badge[data-period="5限"] {
-    border-left: 3px solid #34d399;
-}
-
-.attendance-badge[data-period="6限"] {
-    border-left: 3px solid #22d3ee;
-}
-
-.attendance-badge[data-period="7限"] {
-    border-left: 3px solid #60a5fa;
-}
-
-.attendance-badge[data-period="放課後"] {
-    border-left: 3px solid #a78bfa;
-}
+/* Consistent class colors using data-color-index */
+.attendance-badge[data-color-index="0"] { border-left: 3px solid #f87171; }
+.attendance-badge[data-color-index="1"] { border-left: 3px solid #fb923c; }
+.attendance-badge[data-color-index="2"] { border-left: 3px solid #fbbf24; }
+.attendance-badge[data-color-index="3"] { border-left: 3px solid #a3e635; }
+.attendance-badge[data-color-index="4"] { border-left: 3px solid #34d399; }
+.attendance-badge[data-color-index="5"] { border-left: 3px solid #22d3ee; }
+.attendance-badge[data-color-index="6"] { border-left: 3px solid #60a5fa; }
+.attendance-badge[data-color-index="7"] { border-left: 3px solid #a78bfa; }
 
 /* Data Table */
 .table-container {
@@ -1109,14 +1086,14 @@ select:focus {
     }
     
     /* Apply background colors since text is hidden */
-    .attendance-badge[data-period="1限"] { background-color: #f87171; }
-    .attendance-badge[data-period="2限"] { background-color: #fb923c; }
-    .attendance-badge[data-period="3限"] { background-color: #fbbf24; }
-    .attendance-badge[data-period="4限"] { background-color: #a3e635; }
-    .attendance-badge[data-period="5限"] { background-color: #34d399; }
-    .attendance-badge[data-period="6限"] { background-color: #22d3ee; }
-    .attendance-badge[data-period="7限"] { background-color: #60a5fa; }
-    .attendance-badge[data-period="放課後"] { background-color: #a78bfa; }
+    .attendance-badge[data-color-index="0"], .attendance-badge-inline[data-color-index="0"] { background-color: #f87171; }
+    .attendance-badge[data-color-index="1"], .attendance-badge-inline[data-color-index="1"] { background-color: #fb923c; }
+    .attendance-badge[data-color-index="2"], .attendance-badge-inline[data-color-index="2"] { background-color: #fbbf24; }
+    .attendance-badge[data-color-index="3"], .attendance-badge-inline[data-color-index="3"] { background-color: #a3e635; }
+    .attendance-badge[data-color-index="4"], .attendance-badge-inline[data-color-index="4"] { background-color: #34d399; }
+    .attendance-badge[data-color-index="5"], .attendance-badge-inline[data-color-index="5"] { background-color: #22d3ee; }
+    .attendance-badge[data-color-index="6"], .attendance-badge-inline[data-color-index="6"] { background-color: #60a5fa; }
+    .attendance-badge[data-color-index="7"], .attendance-badge-inline[data-color-index="7"] { background-color: #a78bfa; }
 
     .calendar-header { 
         display: grid; 

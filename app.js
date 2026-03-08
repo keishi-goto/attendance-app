@@ -967,11 +967,14 @@ class UIController {
                         const cls = this.storage.data.classes.find(c => c.id === classData.classId);
                         const className = cls ? cls.name : '不明なクラス';
 
+                        const classIndex = this.storage.data.classes.findIndex(c => c.id === classData.classId);
+
                         const badge = document.createElement('div');
                         badge.className = 'attendance-badge';
                         badge.textContent = `${period}: ${className}`;
                         badge.dataset.date = dateStr;
                         badge.dataset.period = period;
+                        badge.dataset.colorIndex = classIndex >= 0 ? classIndex % 8 : 0; // consistent color by class
                         badge.title = `${period}: ${className} (クリックして編集)`;
 
                         badge.addEventListener('click', (e) => {
@@ -1015,10 +1018,14 @@ class UIController {
                 if (dailyData[period]) {
                     hasClasses = true;
                     const classData = dailyData[period];
+                    const classIndex = this.storage.data.classes.findIndex(c => c.id === classData.classId);
                     const cls = this.storage.data.classes.find(c => c.id === classData.classId);
                     const className = cls ? cls.name : '不明なクラス';
                     
                     const btn = document.createElement('button');
+                    // Add a tiny colored dot next to the class name to match the calendar
+                    const dotColorIndex = classIndex >= 0 ? classIndex % 8 : 0;
+                    
                     btn.className = 'btn btn-outline';
                     btn.style.width = '100%';
                     btn.style.textAlign = 'left';
@@ -1027,8 +1034,11 @@ class UIController {
                     btn.style.justifyContent = 'space-between';
                     
                     btn.innerHTML = `
-                        <span style="font-weight: bold;">${period}</span>
-                        <span>${className}</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="attendance-badge-inline" data-color-index="${dotColorIndex}" style="width: 12px; height: 12px; border-radius: 50%; display: inline-block;"></span>
+                            <span style="font-weight: bold;">${period}</span>
+                            <span>${className}</span>
+                        </div>
                         <span style="color: var(--text-muted); font-size: 0.8rem;">✏️ 編集</span>
                     `;
                     
