@@ -501,13 +501,23 @@ class UIController {
         const startupModal = document.getElementById('modal-startup');
         
         if (this.storage.ghSettings.enabled && this.storage.ghSettings.token) {
-            // Already configured for GitHub Sync - bypass modal and load
-            startupModal.classList.remove('active');
+            // Setup Loading UI
+            document.getElementById('startup-options').style.display = 'none';
+            document.getElementById('startup-options-bottom').style.display = 'none';
+            document.getElementById('startup-loading').style.display = 'block';
+            document.getElementById('startup-modal-title').textContent = 'クラウド同期';
+            startupModal.classList.add('active');
+            
             if (await this.storage.loadDataFromGitHub()) {
+                startupModal.classList.remove('active');
                 this.refreshAllViews();
                 this.showToast('GitHubからデータを同期しました');
             } else {
-                startupModal.classList.add('active'); // Show modal if failed
+                // Restore UI if failed
+                document.getElementById('startup-options').style.display = 'block';
+                document.getElementById('startup-options-bottom').style.display = 'block';
+                document.getElementById('startup-loading').style.display = 'none';
+                document.getElementById('startup-modal-title').textContent = 'データファイルの選択';
                 alert('GitHubからのデータ取得に失敗しました。設定を確認してください。');
                 this.storage.saveGitHubSettings({ enabled: false });
             }
@@ -541,27 +551,33 @@ class UIController {
     }
 
     handleSyncStatusUpdate(status, filename = null) {
-        const dot = document.getElementById('sync-dot');
-        const text = document.getElementById('sync-text');
+        const dots = [document.getElementById('sync-dot'), document.getElementById('mobile-sync-dot')];
+        const texts = [document.getElementById('sync-text'), document.getElementById('mobile-sync-text')];
 
-        dot.className = 'status-dot'; // reset
+        const updateElements = (textStr, addClass) => {
+            dots.forEach(dot => {
+                if(dot) {
+                    dot.className = 'status-dot'; // reset
+                    dot.classList.add(addClass);
+                }
+            });
+            texts.forEach(text => {
+                if(text) text.textContent = textStr;
+            });
+        };
 
         switch (status) {
             case 'disconnected':
-                dot.classList.add('disconnected');
-                text.textContent = '未接続 (ブラウザ保存のみ)';
+                updateElements('未接続 (ブラウザ保存のみ)', 'disconnected');
                 break;
             case 'syncing':
-                dot.classList.add('syncing');
-                text.textContent = '同期中...';
+                updateElements('同期中...', 'syncing');
                 break;
             case 'synced':
-                dot.classList.add('synced');
-                text.textContent = filename ? `${filename} と同期中` : 'ファイルと同期済み';
+                updateElements(filename ? `${filename} と同期中` : 'ファイルと同期済み', 'synced');
                 break;
             case 'error':
-                dot.classList.add('error');
-                text.textContent = 'ファイル保存エラー';
+                updateElements('ファイル保存エラー', 'error');
                 break;
         }
     }
@@ -652,18 +668,25 @@ class UIController {
         }
         
         // GitHub API Settings Modal Logic
+        const openGitHubSettings = () => {
+            document.getElementById('gh-setting-owner').value = this.storage.ghSettings.owner || '';
+            document.getElementById('gh-setting-repo').value = this.storage.ghSettings.repo || '';
+            document.getElementById('gh-setting-path').value = this.storage.ghSettings.path || 'data.json';
+            document.getElementById('gh-setting-token').value = this.storage.ghSettings.token || '';
+            document.getElementById('gh-sync-test-result').textContent = '';
+            
+            document.getElementById('modal-github-settings').classList.add('active');
+        };
+
         const btnStartupGithub = document.getElementById('btn-startup-github-sync');
         if (btnStartupGithub) {
-            btnStartupGithub.addEventListener('click', () => {
-                // Populate existing settings
-                document.getElementById('gh-setting-owner').value = this.storage.ghSettings.owner || '';
-                document.getElementById('gh-setting-repo').value = this.storage.ghSettings.repo || '';
-                document.getElementById('gh-setting-path').value = this.storage.ghSettings.path || 'data.json';
-                document.getElementById('gh-setting-token').value = this.storage.ghSettings.token || '';
-                document.getElementById('gh-sync-test-result').textContent = '';
-                
-                document.getElementById('modal-github-settings').classList.add('active');
-            });
+            btnStartupGithub.addEventListener('click', openGitHubSettings);
+        }
+        
+        // Mobile settings view buttons
+        const btnMobileGitHub = document.getElementById('btn-mobile-github-sync');
+        if (btnMobileGitHub) {
+            btnMobileGitHub.addEventListener('click', openGitHubSettings);
         }
 
         document.getElementById('btn-gh-test-conn').addEventListener('click', async () => {
@@ -726,6 +749,11 @@ class UIController {
         
         // ファイル操作APIが非対応の環境（スマホなど）の処理
         const isFSSupported = 'showOpenFilePicker' in window;
+        if (!isFSSupported || window.innerWidth <= 768) {
+            // Show settings tab on mobile explicitly
+            document.getElementById('nav-settings-mobile').style.display = 'flex';
+        }
+        
         if (!isFSSupported) {
             // サイドバーのボタンを非表示
             const btnFsNew = document.getElementById('btn-fs-new');
@@ -742,20 +770,25 @@ class UIController {
             // モーダルの説明文を変更
             const startupDesc = document.getElementById('startup-desc-text');
             if (startupDesc) {
-                startupDesc.innerHTML = 'お使いのブラウザ（スマートフォンや未対応環境）はファイル直接同期に非対応です。<br><small>「ブラウザのみで利用」を選択し、定期的にデータを「出力」からバックアップしてください。</small>';
+                startupDesc.innerHTML = 'お使いのブラウザ（スマートフォンや未対応環境）はファイル直接同期に非対応です。<br><small>「クラウドと同期」または「ブラウザのみ」を選択してください。</small>';
             }
         }
 
-        // Export/Import (Fallback)
-        document.getElementById('btn-export').addEventListener('click', () => {
+        const handleImport = () => fileInput.click();
+        const handleExport = () => {
             this.storage.exportData();
             this.showToast('データをエクスポートしました');
-        });
+        };
 
-        const fileInput = document.getElementById('file-import');
-        document.getElementById('btn-import').addEventListener('click', () => {
-            fileInput.click();
-        });
+        // Export/Import (Fallback) desktop
+        document.getElementById('btn-export').addEventListener('click', handleExport);
+        document.getElementById('btn-import').addEventListener('click', handleImport);
+
+        // Export/Import mobile
+        const btnMobileExport = document.getElementById('btn-mobile-export');
+        const btnMobileImport = document.getElementById('btn-mobile-import');
+        if (btnMobileExport) btnMobileExport.addEventListener('click', handleExport);
+        if (btnMobileImport) btnMobileImport.addEventListener('click', handleImport);
 
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
