@@ -771,7 +771,78 @@ class UIController {
                     alert('同期に失敗しました。設定を見直してください。');
                     this.storage.saveGitHubSettings({ enabled: false });
                     document.getElementById('modal-startup').classList.add('active');
+            }
+        });
+
+        document.getElementById('btn-gh-create-new').addEventListener('click', async () => {
+            const owner = document.getElementById('gh-setting-owner').value.trim();
+            const repo = document.getElementById('gh-setting-repo').value.trim();
+            const path = document.getElementById('gh-setting-path').value.trim();
+            const token = document.getElementById('gh-setting-token').value.trim();
+
+            if (!owner || !repo || !path || !token) {
+                alert('すべての項目を入力してください。');
+                return;
+            }
+
+            if (!confirm(`本当に「${path}」という空のファイルをGitHubに新規作成しますか？`)) {
+                return;
+            }
+
+            try {
+                // 1. Check if file already exists to prevent overwrite
+                const checkUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+                const checkRes = await fetch(checkUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (checkRes.ok) {
+                    alert('エラー：そのファイルパスは既に存在します。上書きを防ぐため中止しました。既存ファイルと同期する場合は「保存して同期開始」を選んでください。');
+                    return;
                 }
+
+                if (checkRes.status !== 404) {
+                    throw new Error(`GitHub API エラー: ${checkRes.status} ${checkRes.statusText}`);
+                }
+
+                // 2. File doesn't exist (404), so create it
+                const emptyData = { classes: [], attendance: {} };
+                const contentStr = JSON.stringify(emptyData, null, 2);
+                const contentBase64 = btoa(unescape(encodeURIComponent(contentStr)));
+
+                const createRes = await fetch(checkUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'feat: initialize new attendance data file',
+                        content: contentBase64
+                    })
+                });
+
+                if (!createRes.ok) {
+                    throw new Error(`ファイル作成に失敗しました: ${createRes.status}`);
+                }
+
+                // 3. Success -> Save settings and initialize app
+                this.storage.saveGitHubSettings({ owner, repo, path, token, enabled: true });
+                document.getElementById('modal-github-settings').classList.remove('active');
+                document.getElementById('modal-startup').classList.remove('active');
+                
+                await this.storage.loadDataFromGitHub();
+                this.refreshAllViews();
+                this.showToast('🚀 GitHubに新規ファイルを作成し、同期を開始しました！');
+
+            } catch (error) {
+                console.error('Error creating new GitHub file:', error);
+                alert('エラーが発生しました: ' + error.message);
             }
         });
         
