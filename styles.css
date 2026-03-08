@@ -1105,6 +1105,7 @@ select:focus {
         font-size: 0; /* Hide text */
         display: inline-block;
         color: transparent;
+        pointer-events: none; /* Prevent accidental taps on these tiny dots */
     }
     
     /* Apply background colors since text is hidden */

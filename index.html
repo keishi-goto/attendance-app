@@ -180,6 +180,31 @@
 
     <!-- =============== Modals =============== -->
 
+    <!-- Modal: Daily Classes Menu (Mobile) -->
+    <div id="modal-daily-classes" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="daily-classes-title">📅 月 日のクラス</h2>
+                <button class="btn-close-modal" data-target="modal-daily-classes">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+                    この日に登録されているクラスを選択して編集するか、新しい時限を追加してください。
+                </p>
+                
+                <div id="daily-classes-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                    <!-- JS dynamically inserts buttons here -->
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <button id="btn-daily-add-new" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem;">
+                        ＋ 新しい時限を追加
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: Attendance Editor -->
     <div id="modal-attendance-editor" class="modal">
         <div class="modal-content large">

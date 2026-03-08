@@ -895,6 +895,15 @@ class UIController {
 
         document.getElementById('btn-save-attendance').addEventListener('click', () => this.saveAttendanceFromModal());
         document.getElementById('btn-delete-attendance').addEventListener('click', () => this.deleteAttendanceEntry());
+
+        // Daily Classes Modal New Button
+        const btnDailyAddNew = document.getElementById('btn-daily-add-new');
+        if (btnDailyAddNew) {
+            btnDailyAddNew.addEventListener('click', () => {
+                document.getElementById('modal-daily-classes').classList.remove('active');
+                this.openAttendanceModal(this.calendarDateSelected, null);
+            });
+        }
     }
 
     renderCalendar() {
@@ -938,8 +947,9 @@ class UIController {
             `;
             
             // Allow tapping the date number area to add attendance (especially for mobile where + is hidden)
+            // Allow tapping the date number area (or cell) to open the daily menu 
             cellTop.addEventListener('click', () => {
-                this.openAttendanceModal(dateStr, null);
+                this.openDailyClassesModal(dateStr);
             });
             
             cell.appendChild(cellTop);
@@ -965,7 +975,8 @@ class UIController {
                         badge.title = `${period}: ${className} (クリックして編集)`;
 
                         badge.addEventListener('click', (e) => {
-                            this.openAttendanceModal(e.currentTarget.dataset.date, e.currentTarget.dataset.period);
+                            e.stopPropagation(); // Avoid triggering cell top click if they somehow click this directly
+                            this.openAttendanceModal(dateStr, period);
                         });
 
                         badgesContainer.appendChild(badge);
@@ -978,11 +989,64 @@ class UIController {
         }
 
         // Event for + buttons
+        // Event for + buttons (still present on desktop)
         document.querySelectorAll('.btn-add-attendance').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                this.openAttendanceModal(e.currentTarget.dataset.date, null);
+                e.stopPropagation();
+                this.openDailyClassesModal(e.currentTarget.dataset.date);
             });
         });
+    }
+
+    openDailyClassesModal(dateStr) {
+        this.calendarDateSelected = dateStr;
+        const [year, month, day] = dateStr.split('-');
+        
+        document.getElementById('daily-classes-title').textContent = `📅 ${parseInt(month)}月 ${parseInt(day)}日のクラス`;
+        
+        const listContainer = document.getElementById('daily-classes-list');
+        listContainer.innerHTML = '';
+        
+        const dailyData = this.storage.data.attendance[dateStr];
+        let hasClasses = false;
+
+        if (dailyData) {
+            PERIODS.forEach(period => {
+                if (dailyData[period]) {
+                    hasClasses = true;
+                    const classData = dailyData[period];
+                    const cls = this.storage.data.classes.find(c => c.id === classData.classId);
+                    const className = cls ? cls.name : '不明なクラス';
+                    
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-outline';
+                    btn.style.width = '100%';
+                    btn.style.textAlign = 'left';
+                    btn.style.padding = '14px';
+                    btn.style.display = 'flex';
+                    btn.style.justifyContent = 'space-between';
+                    
+                    btn.innerHTML = `
+                        <span style="font-weight: bold;">${period}</span>
+                        <span>${className}</span>
+                        <span style="color: var(--text-muted); font-size: 0.8rem;">✏️ 編集</span>
+                    `;
+                    
+                    btn.addEventListener('click', () => {
+                        document.getElementById('modal-daily-classes').classList.remove('active');
+                        this.openAttendanceModal(dateStr, period);
+                    });
+                    
+                    listContainer.appendChild(btn);
+                }
+            });
+        }
+        
+        if (!hasClasses) {
+            listContainer.innerHTML = '<div style="text-align:center; padding: 20px 0; color: var(--text-muted);">まだ登録されていません</div>';
+        }
+
+        document.getElementById('modal-daily-classes').classList.add('active');
     }
 
     openAttendanceModal(dateStr, originalPeriod) {
