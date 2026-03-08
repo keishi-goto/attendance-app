@@ -71,6 +71,18 @@
           "status": "通常"
         }
       ]
+    },
+    {
+      "id": "_43k5b0nah",
+      "name": "1-4",
+      "students": [
+        {
+          "id": "_k4c3naeoc",
+          "number": 1,
+          "name": "A",
+          "status": "通常"
+        }
+      ]
     }
   ],
   "attendance": {
