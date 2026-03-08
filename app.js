@@ -771,6 +771,7 @@ class UIController {
                     alert('同期に失敗しました。設定を見直してください。');
                     this.storage.saveGitHubSettings({ enabled: false });
                     document.getElementById('modal-startup').classList.add('active');
+                }
             }
         });
 
