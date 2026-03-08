@@ -116,6 +116,85 @@ body {
     font-size: 1.1rem;
 }
 
+/* =========================================
+   Mobile Optimized Editor & Layout
+   ========================================= */
+@media (max-width: 768px) {
+    /* Hide some unnecessary desktop borders and headers */
+    .view-header h1 { font-size: 1.25rem; }
+    
+    .content-area {
+        padding: 12px;
+        padding-bottom: 80px; 
+        overflow-x: hidden;
+    }
+
+    /* Calendar Mobile List View (Vertical) */
+    .calendar-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-bottom: 24px;
+    }
+    .calendar-cell {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 50px;
+        padding: 10px 12px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
+    }
+    .calendar-cell .date-num {
+        display: inline-block;
+        margin-right: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .calendar-cell .att-count {
+        margin-top: 0;
+        text-align: right;
+    }
+    .calendar-cell.empty { display: none; }
+    .calendar-header { display: none; }
+    
+    /* Table Responsive Adjustments */
+    .table-container {
+        padding: 0;
+        width: 100%;
+        overflow-x: hidden;
+    }
+    .table-container table {
+        display: block;
+        width: 100%;
+    }
+    /* Summary View scrolling */
+    #view-attendance-summary .table-container {
+        overflow-x: auto;
+    }
+
+    #att-edit-table tbody tr {
+        margin-bottom: 8px;
+        padding: 12px;
+    }
+    .attendance-options {
+        display: flex;
+        gap: 4px;
+        justify-content: space-between;
+    }
+    .attendance-label {
+        flex: 1;
+        padding: 12px 0;
+        font-size: 0.9rem;
+    }
+
+    .sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid var(--border-color);
+        background-color: var(--surface-color);
+    }
+}
 .sidebar-footer {
     padding: 16px;
     border-top: 1px solid var(--border-color);
