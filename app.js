@@ -698,6 +698,25 @@ class UIController {
             btnMobileGitHub.addEventListener('click', openGitHubSettings);
         }
 
+        const btnMobileGitHubPull = document.getElementById('btn-mobile-github-pull');
+        if (btnMobileGitHubPull) {
+            btnMobileGitHubPull.addEventListener('click', async () => {
+                if (!this.storage.ghSettings.enabled || !this.storage.ghSettings.token) {
+                    alert('まずはクラウド連携の設定を行ってください。');
+                    return;
+                }
+                
+                if (confirm('クラウド上の最新データで現在の表示を上書きしますか？未保存の編集データは失われます。')) {
+                    if (await this.storage.loadDataFromGitHub()) {
+                        this.refreshAllViews();
+                        this.showToast('クラウドから最新データを強制取得しました');
+                    } else {
+                        alert('クラウドからのデータ取得に失敗しました。');
+                    }
+                }
+            });
+        }
+
         document.getElementById('btn-gh-test-conn').addEventListener('click', async () => {
             const owner = document.getElementById('gh-setting-owner').value.trim();
             const repo = document.getElementById('gh-setting-repo').value.trim();
