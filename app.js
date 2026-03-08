@@ -774,6 +774,7 @@ class UIController {
             }
         }
 
+        const fileInput = document.getElementById('file-import');
         const handleImport = () => fileInput.click();
         const handleExport = () => {
             this.storage.exportData();
