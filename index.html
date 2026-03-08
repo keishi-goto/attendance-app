@@ -310,16 +310,58 @@
 
                 <p style="margin-bottom: 20px; color: var(--text-muted);" id="startup-desc-text">
                     データの保存先（JSONファイル）を選択してください。<br>
-                    <small>※ブラウザ上だけでの作業はデータ消失のリスクがあるため推奨していませんが、<br>スマホ等の環境では「ブラウザのみで利用」を選択してください。</small>
+                    <small>※ブラウザ上だけでの作業はデータ消失のリスクがあるため推奨していませんが、<br>スマホ等の環境では「クラウド（GitHub）と同期」または「ブラウザのみで利用」を選択してください。</small>
                 </p>
                 <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
                     <button type="button" class="btn btn-outline" id="btn-startup-new">新規ファイルを作成...</button>
                     <button type="button" class="btn btn-outline" id="btn-startup-open">既存ファイルを開く...</button>
+                    <button type="button" class="btn btn-primary" id="btn-startup-github-sync">☁️ クラウド（GitHub）と同期</button>
                     <button type="button" class="btn btn-secondary" id="btn-startup-browser-only">ブラウザのみで利用（同期なし）</button>
                 </div>
 
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 24px 0;">
 
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: GitHub API Settings -->
+    <div id="modal-github-settings" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>クラウド同期（GitHub）設定</h2>
+                <button class="btn-close-modal" data-target="modal-github-settings">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 16px; font-size: 0.9em; color: var(--text-muted);">
+                    GitHubの特定のリポジトリにあるJSONファイルと直接データを同期します。<br>
+                    これらの設定は現在お使いのブラウザにのみ保存されます。
+                </p>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>GitHubユーザー名 (Owner)</label>
+                    <input type="text" id="gh-setting-owner" placeholder="例: yamada-taro">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>リポジトリ名 (Repo)</label>
+                    <input type="text" id="gh-setting-repo" placeholder="例: attendance-app">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>ファイルパス (Path)</label>
+                    <input type="text" id="gh-setting-path" placeholder="例: data.json" value="data.json">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>Personal Access Token (PAT) <small style="color:#f87171">※必須</small></label>
+                    <input type="password" id="gh-setting-token" placeholder="ghp_ または github_pat_ から始まる文字列">
+                </div>
+                <div style="background-color: var(--table-hover-bg); padding: 12px; border-radius: var(--radius-md); font-size: 0.85em; margin-bottom: 10px;">
+                    <div id="gh-sync-test-result"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="btn-gh-test-conn">接続テスト</button>
+                <span style="flex: 1;"></span>
+                <button type="button" class="btn btn-outline btn-close-modal" data-target="modal-github-settings">キャンセル</button>
+                <button type="button" class="btn btn-primary" id="btn-gh-save-settings">保存して同期開始</button>
             </div>
         </div>
     </div>

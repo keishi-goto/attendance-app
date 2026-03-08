@@ -43,7 +43,25 @@ class StorageManager {
         this.IDB_KEY_HANDLE = 'recentFileHandle';
 
         this.fileHandle = null;
+        
+        // GitHub API Settings
+        this.ghSettings = this.loadGitHubSettings();
+        
         this.data = this.loadDataFromLocal(); // Backup/Default source
+    }
+
+    // --- GitHub API Settings ---
+    loadGitHubSettings() {
+        const str = localStorage.getItem('gh_sync_settings');
+        if (str) {
+            try { return JSON.parse(str); } catch (e) { }
+        }
+        return { owner: '', repo: '', path: 'data.json', token: '', enabled: false, lastSha: null };
+    }
+
+    saveGitHubSettings(settings) {
+        this.ghSettings = { ...this.ghSettings, ...settings };
+        localStorage.setItem('gh_sync_settings', JSON.stringify(this.ghSettings));
     }
 
     // Sync UI Update callback
@@ -77,6 +95,10 @@ class StorageManager {
 
     async saveData() {
         this.saveDataToLocal(); // Always keep local copy as fallback
+
+        if (this.ghSettings && this.ghSettings.enabled) {
+            return await this.saveDataToGitHub();
+        }
 
         if (this.fileHandle) {
             try {
@@ -197,6 +219,145 @@ class StorageManager {
             return true;
         }
         return false;
+    }
+
+    // --- GitHub API Sync ---
+
+    async testGitHubConnection(owner, repo, path, token) {
+        try {
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (response.status === 200) {
+                return { success: true, message: '接続成功！既存のファイルが見つかりました。' };
+            } else if (response.status === 404) {
+                return { success: true, message: '接続成功！新しいファイルとして作成されます。' };
+            } else if (response.status === 401) {
+                return { success: false, message: '認証エラー：Tokenが間違っているか、権限がありません。' };
+            } else {
+                return { success: false, message: `エラー：HTTP ${response.status}` };
+            }
+        } catch (err) {
+            return { success: false, message: `通信エラー：${err.message}` };
+        }
+    }
+
+    async loadDataFromGitHub() {
+        if (!this.ghSettings.enabled || !this.ghSettings.token) return false;
+        
+        this.updateSyncStatus('syncing');
+        try {
+            const { owner, repo, path, token } = this.ghSettings;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (response.status === 200) {
+                const result = await response.json();
+                
+                // Decode Base64 content properly (handling UTF-8)
+                const binaryString = atob(result.content);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const decoder = new TextDecoder('utf-8');
+                const jsonString = decoder.decode(bytes);
+                
+                const parsed = JSON.parse(jsonString);
+                
+                if (parsed.classes && parsed.attendance) {
+                    this.data = parsed;
+                    this.saveDataToLocal();
+                    
+                    // Save the SHA for future updates to avoid conflict
+                    this.saveGitHubSettings({ lastSha: result.sha });
+                    
+                    this.updateSyncStatus('synced', `GitHub: ${repo}/${path}`);
+                    return true;
+                } else {
+                    throw new Error('Invalid data format in GitHub file');
+                }
+            } else if (response.status === 404) {
+                // File doesn't exist yet, we will create it on next save
+                this.updateSyncStatus('synced', `GitHub: (New) ${repo}/${path}`);
+                return true;
+            } else {
+                throw new Error(`HTTP ${response.status}`);
+            }
+        } catch (err) {
+            console.error('Failed to load from GitHub:', err);
+            this.updateSyncStatus('disconnected');
+            return false;
+        }
+    }
+
+    async saveDataToGitHub() {
+        if (!this.ghSettings.enabled || !this.ghSettings.token) return false;
+        
+        this.updateSyncStatus('syncing');
+        try {
+            const { owner, repo, path, token, lastSha } = this.ghSettings;
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            
+            // Encode data to Base64 (handling UTF-8)
+            const jsonString = JSON.stringify(this.data, null, 2);
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(jsonString);
+            let binaryString = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binaryString += String.fromCharCode(bytes[i]);
+            }
+            const b64Content = btoa(binaryString);
+
+            const body = {
+                message: `Update attendance data via App - ${getTodayString()}`,
+                content: b64Content
+            };
+            
+            if (lastSha) {
+                body.sha = lastSha;
+            }
+
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (response.status === 200 || response.status === 201) {
+                const result = await response.json();
+                this.saveGitHubSettings({ lastSha: result.content.sha });
+                this.updateSyncStatus('synced', `GitHub: ${repo}/${path}`);
+                return true;
+            } else if (response.status === 409) {
+                // Conflict - someone else updated it. 
+                // In a perfect world we would merge, but for now we'll just fail gracefully.
+                this.updateSyncStatus('error');
+                alert('GitHub上でのデータ衝突（コンフリクト）が発生しました。\n他の端末からの同時編集などでファイルが書き換えられています。');
+                return false;
+            } else {
+                throw new Error(`HTTP ${response.status}`);
+            }
+        } catch (err) {
+            console.error('Failed to save to GitHub:', err);
+            this.updateSyncStatus('error');
+            return false;
+        }
     }
 
     // --- IndexedDB for File Handle Persistence ---
@@ -335,19 +496,29 @@ class UIController {
         // 初期表示をセット
         this.switchView('attendance-input');
 
-        // Check for returning IDB persistent file handle
+        // Check for returning IDB persistent file handle OR GitHub sync settings
         const storedHandle = await this.storage.loadStoredFileHandle();
         const startupModal = document.getElementById('modal-startup');
-
-        if (storedHandle) {
+        
+        if (this.storage.ghSettings.enabled && this.storage.ghSettings.token) {
+            // Already configured for GitHub Sync - bypass modal and load
+            startupModal.classList.remove('active');
+            if (await this.storage.loadDataFromGitHub()) {
+                this.refreshAllViews();
+                this.showToast('GitHubからデータを同期しました');
+            } else {
+                startupModal.classList.add('active'); // Show modal if failed
+                alert('GitHubからのデータ取得に失敗しました。設定を確認してください。');
+                this.storage.saveGitHubSettings({ enabled: false });
+            }
+        } else if (storedHandle) {
             document.getElementById('startup-has-file').style.display = 'block';
             document.getElementById('startup-filename-text').textContent = storedHandle.name;
+            startupModal.classList.add('active');
         } else {
             document.getElementById('startup-has-file').style.display = 'none';
+            startupModal.classList.add('active');
         }
-
-        // Show startup modal to enforce file selection
-        startupModal.classList.add('active');
     }
 
     refreshAllViews() {
@@ -479,6 +650,79 @@ class UIController {
                 this.showToast('ブラウザ保存モードで開始しました。データは定期的に出力してください。');
             });
         }
+        
+        // GitHub API Settings Modal Logic
+        const btnStartupGithub = document.getElementById('btn-startup-github-sync');
+        if (btnStartupGithub) {
+            btnStartupGithub.addEventListener('click', () => {
+                // Populate existing settings
+                document.getElementById('gh-setting-owner').value = this.storage.ghSettings.owner || '';
+                document.getElementById('gh-setting-repo').value = this.storage.ghSettings.repo || '';
+                document.getElementById('gh-setting-path').value = this.storage.ghSettings.path || 'data.json';
+                document.getElementById('gh-setting-token').value = this.storage.ghSettings.token || '';
+                document.getElementById('gh-sync-test-result').textContent = '';
+                
+                document.getElementById('modal-github-settings').classList.add('active');
+            });
+        }
+
+        document.getElementById('btn-gh-test-conn').addEventListener('click', async () => {
+            const owner = document.getElementById('gh-setting-owner').value.trim();
+            const repo = document.getElementById('gh-setting-repo').value.trim();
+            const path = document.getElementById('gh-setting-path').value.trim();
+            const token = document.getElementById('gh-setting-token').value.trim();
+            const resultDiv = document.getElementById('gh-sync-test-result');
+
+            if (!owner || !repo || !path || !token) {
+                resultDiv.innerHTML = '<span style="color:#f87171">すべての項目を入力してください。</span>';
+                return;
+            }
+
+            resultDiv.innerHTML = 'テスト中...';
+            const res = await this.storage.testGitHubConnection(owner, repo, path, token);
+            
+            if (res.success) {
+                resultDiv.innerHTML = `<span style="color:#34d399">✅ ${res.message}</span>`;
+            } else {
+                resultDiv.innerHTML = `<span style="color:#f87171">❌ ${res.message}</span>`;
+            }
+        });
+
+        document.getElementById('btn-gh-save-settings').addEventListener('click', async () => {
+            const owner = document.getElementById('gh-setting-owner').value.trim();
+            const repo = document.getElementById('gh-setting-repo').value.trim();
+            const path = document.getElementById('gh-setting-path').value.trim();
+            const token = document.getElementById('gh-setting-token').value.trim();
+
+            if (!owner || !repo || !path || !token) {
+                alert('すべての項目を入力してください。');
+                return;
+            }
+
+            // Save and enable
+            this.storage.saveGitHubSettings({
+                owner, repo, path, token, enabled: true
+            });
+
+            document.getElementById('modal-github-settings').classList.remove('active');
+            document.getElementById('modal-startup').classList.remove('active');
+            
+            // Initiate sync
+            if (await this.storage.loadDataFromGitHub()) {
+                this.refreshAllViews();
+                this.showToast('GitHubからデータを同期し、設定を保存しました');
+            } else {
+                // Attempt to save data if new file
+                if (await this.storage.saveDataToGitHub()) {
+                    this.refreshAllViews();
+                    this.showToast('GitHubに新規ファイルを作成して同期を開始しました');
+                } else {
+                    alert('同期に失敗しました。設定を見直してください。');
+                    this.storage.saveGitHubSettings({ enabled: false });
+                    document.getElementById('modal-startup').classList.add('active');
+                }
+            }
+        });
         
         // ファイル操作APIが非対応の環境（スマホなど）の処理
         const isFSSupported = 'showOpenFilePicker' in window;
