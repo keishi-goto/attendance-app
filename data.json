@@ -60,11 +60,12 @@
       }
     },
     "2026-03-03": {
-      "1限": {
+      "2限": {
         "classId": "_ja3ngxxun",
         "records": {
           "_vvd7l42eq": "出席",
-          "_qoguorfly": "欠席"
+          "_qoguorfly": "欠席",
+          "_5tzlpklg0": "出席"
         }
       }
     },
