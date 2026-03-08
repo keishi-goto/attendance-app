@@ -86,8 +86,9 @@
 
             <!-- View: Attendance Summary -->
             <section id="view-attendance-summary" class="view">
-                <header class="view-header">
+                <header class="view-header flex-header" style="flex-wrap: wrap;">
                     <h1>出欠一覧・集計</h1>
+                    <button id="btn-export-excel" class="btn btn-outline" style="font-size: 0.9rem;">📥 Excelでダウンロード</button>
                 </header>
                 <div class="controls-panel horizontal-controls">
                     <div class="form-group">
@@ -402,7 +403,6 @@
                         新しく選択・作成する場合は以下から選んでください。
                     </p>
                     <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; margin-bottom: 24px;">
-                        <button type="button" class="btn btn-outline" id="btn-startup-new" style="width: 100%; max-width: 300px;">📁 新規ファイルを作成 (ローカル保存)...</button>
                         <button type="button" class="btn btn-outline" id="btn-startup-open" style="width: 100%; max-width: 300px;">📂 既存ファイルを開く (ローカル保存)...</button>
                         <div style="width: 100%; max-width: 300px; height: 1px; background: var(--border-color); margin: 8px 0;"></div>
                         <button type="button" class="btn btn-primary" id="btn-startup-github-sync-pc" style="width: 100%; max-width: 300px;">☁️ クラウド連携を開始 (既存データ)</button>

@@ -631,14 +631,6 @@ class UIController {
             }
         });
 
-        document.getElementById('btn-startup-new').addEventListener('click', async () => {
-            if (await this.storage.createNewFile()) {
-                document.getElementById('modal-startup').classList.remove('active');
-                this.refreshAllViews();
-                this.showToast('新しいファイルを作成し、同期を開始しました');
-            }
-        });
-
         document.getElementById('btn-startup-open').addEventListener('click', async () => {
             if (await this.storage.openExistingFile()) {
                 document.getElementById('modal-startup').classList.remove('active');
@@ -928,6 +920,31 @@ class UIController {
                 reader.readAsText(file);
             }
         });
+
+        // ==========================================
+        // Excel Export Feature
+        // ==========================================
+        const btnExportExcel = document.getElementById('btn-export-excel');
+        if (btnExportExcel) {
+            btnExportExcel.addEventListener('click', () => {
+                const table = document.getElementById('summary-table');
+                if (!table || table.rows.length <= 1 || table.querySelector('.empty-message')) {
+                    alert('エクスポートするデータがありません。先に集計を行ってください。');
+                    return;
+                }
+                
+                // Create a workbook and add the table as a worksheet
+                const wb = XLSX.utils.table_to_book(table, { sheet: "出欠一覧" });
+                
+                // Construct a filename with today's date
+                const today = new Date();
+                const dateStr = `${today.getFullYear()}${(today.getMonth()+1).toString().padStart(2, '0')}${today.getDate().toString().padStart(2, '0')}`;
+                
+                // Download the file
+                XLSX.writeFile(wb, `出欠一覧_${dateStr}.xlsx`);
+                this.showToast('Excelファイルとしてダウンロードしました');
+            });
+        }
     }
 
     switchView(viewName) {
