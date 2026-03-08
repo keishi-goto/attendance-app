@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教員用出席確認アプリ</title>
+    <link rel="stylesheet" href="styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <!-- SheetJS for Excel Import/Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>出席管理</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item active" data-view="attendance-input">
+                    <span class="icon">✏️</span> 出欠入力 (カレンダー)
+                </li>
+                <li class="nav-item" data-view="attendance-summary">
+                    <span class="icon">📊</span> 出欠一覧
+                </li>
+                <li class="nav-item" data-view="class-management">
+                    <span class="icon">👥</span> クラス管理
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="sync-status" id="sync-status-indicator">
+                    <span class="status-dot disconnected" id="sync-dot"></span>
+                    <span id="sync-text">未接続 (ブラウザ保存のみ)</span>
+                </div>
+                <!-- File System Access API Controls -->
+                <button id="btn-fs-new" class="btn btn-outline btn-sm"
+                    title="新しいファイルを作成して同期を開始します">新規ファイルを作成...</button>
+                <button id="btn-fs-open" class="btn btn-outline btn-sm" title="既存のファイルを開いて同期を開始します">ファイルを開く...</button>
+
+                <!-- Fallback / Manual export/import -->
+                <div class="divider"></div>
+                <div style="display:flex; gap:8px;">
+                    <button id="btn-export" class="btn btn-outline btn-sm" style="flex:1;" title="手動でエクスポート">出力</button>
+                    <button id="btn-import" class="btn btn-outline btn-sm" style="flex:1;" title="手動でインポート">入力</button>
+                </div>
+                <input type="file" id="file-import" accept=".json" style="display: none;">
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+
+            <!-- View: Attendance Input (Calendar) -->
+            <section id="view-attendance-input" class="view active">
+                <header class="view-header flex-header">
+                    <div class="calendar-nav">
+                        <button id="btn-prev-month" class="btn btn-outline btn-sm">◀ 前月</button>
+                        <h1 id="calendar-month-title">2026年 2月</h1>
+                        <button id="btn-next-month" class="btn btn-outline btn-sm">翌月 ▶</button>
+                    </div>
+                    <button id="btn-today-month" class="btn btn-secondary btn-sm">今月</button>
+                </header>
+
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div>日</div>
+                        <div>月</div>
+                        <div>火</div>
+                        <div>水</div>
+                        <div>木</div>
+                        <div>金</div>
+                        <div>土</div>
+                    </div>
+                    <div class="calendar-body" id="calendar-body">
+                        <!-- JSで生成 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Attendance Summary -->
+            <section id="view-attendance-summary" class="view">
+                <header class="view-header">
+                    <h1>出欠一覧・集計</h1>
+                </header>
+                <div class="controls-panel horizontal-controls">
+                    <div class="form-group">
+                        <label for="summary-start-date">期間開始</label>
+                        <input type="date" id="summary-start-date">
+                    </div>
+                    <div class="span-dash">〜</div>
+                    <div class="form-group">
+                        <label for="summary-end-date">期間終了</label>
+                        <input type="date" id="summary-end-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="summary-class-select">クラス</label>
+                        <select id="summary-class-select">
+                            <option value="">クラスを選択</option>
+                        </select>
+                    </div>
+                    <button id="btn-calculate-summary" class="btn btn-primary">集計</button>
+                </div>
+
+                <div class="summary-stats">
+                    <div class="stat-box">
+                        <span class="stat-label">対象期間の合計授業数</span>
+                        <span class="stat-value" id="summary-total-classes">0回</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="summary-table">
+                        <thead>
+                            <tr>
+                                <th>番号</th>
+                                <th>氏名</th>
+                                <th>出席</th>
+                                <th>欠席</th>
+                                <th>出校停止</th>
+                                <th>公欠</th>
+                                <th>忌引き</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-table-body">
+                            <tr>
+                                <td colspan="7" class="empty-message">集計条件を指定して「集計」ボタンを押してください</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- View: Class Management -->
+            <section id="view-class-management" class="view">
+                <header class="view-header flex-header">
+                    <h1>クラス管理</h1>
+                    <button id="btn-add-class" class="btn btn-primary">+ 新規クラス</button>
+                </header>
+
+                <div class="classes-grid" id="classes-list">
+                    <!-- JSで生成 -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- =============== Modals =============== -->
+
+    <!-- Modal: Attendance Editor -->
+    <div id="modal-attendance-editor" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>出欠登録</h2>
+                <button class="btn-close-modal" data-target="modal-attendance-editor">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="controls-panel" style="margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label for="att-edit-date">日付</label>
+                        <input type="date" id="att-edit-date" readonly class="readonly-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="att-edit-period">時限</label>
+                        <select id="att-edit-period">
+                            <option value="1限">1限</option>
+                            <option value="2限">2限</option>
+                            <option value="3限">3限</option>
+                            <option value="4限">4限</option>
+                            <option value="5限">5限</option>
+                            <option value="6限">6限</option>
+                            <option value="7限">7限</option>
+                            <option value="放課後">放課後</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="att-edit-class">クラス</label>
+                        <select id="att-edit-class">
+                            <option value="">クラスを選択</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container scrollable" style="max-height: 50vh;">
+                    <table class="data-table" id="att-edit-table">
+                        <thead>
+                            <tr>
+                                <th width="10%">番号</th>
+                                <th width="30%">氏名</th>
+                                <th width="15%">状態</th>
+                                <th width="45%">出欠</th>
+                            </tr>
+                        </thead>
+                        <tbody id="att-edit-tbody">
+                            <tr>
+                                <td colspan="4" class="empty-message">クラスを選択してください</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer flex-header">
+                <div>
+                    <button type="button" class="btn btn-danger" id="btn-delete-attendance"
+                        style="display:none;">この時限を削除</button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-outline btn-close-modal"
+                        data-target="modal-attendance-editor">キャンセル</button>
+                    <button type="button" class="btn btn-primary" id="btn-save-attendance">保存する</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Summary Detail -->
+    <div id="modal-summary-detail" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="summary-detail-title">詳細一覧</h2>
+                <button class="btn-close-modal" data-target="modal-summary-detail">&times;</button>
+            </div>
+            <div class="modal-body">
+                <ul class="detail-list" id="summary-detail-list">
+                    <!-- JSで生成 -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline btn-close-modal"
+                    data-target="modal-summary-detail">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Class Editor -->
+    <div id="modal-class-editor" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2 id="class-editor-title">クラスの編集</h2>
+                <button class="btn-close-modal" data-target="modal-class-editor">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit-class-name">クラス名</label>
+                    <input type="text" id="edit-class-name" placeholder="例: 1年A組" required>
+                </div>
+
+                <div class="students-editor">
+                    <div class="students-header">
+                        <h3>生徒一覧</h3>
+                        <div>
+                            <button type="button" id="btn-download-template"
+                                class="btn btn-outline btn-sm">テンプレートDL</button>
+                            <input type="file" id="file-import-excel" accept=".xlsx, .csv" style="display:none;">
+                            <button type="button" id="btn-import-excel" class="btn btn-outline btn-sm">インポート</button>
+                        </div>
+                    </div>
+                    <div class="table-container scrollable">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="15%">番号</th>
+                                    <th width="40%">氏名</th>
+                                    <th width="30%">状態</th>
+                                    <th width="15%">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-edit-rows">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 10px; text-align: center;">
+                        <button type="button" id="btn-add-student-row" class="btn btn-secondary btn-sm">+ 行を追加</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline btn-close-modal"
+                    data-target="modal-class-editor">キャンセル</button>
+                <button type="button" class="btn btn-primary" id="btn-save-class">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Startup / Require Sync -->
+    <div id="modal-startup" class="modal" style="background-color: var(--bg-color);">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>データファイルの選択</h2>
+                <!-- No close button to force selection -->
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 40px 20px;">
+                <div id="startup-has-file" style="display: none;">
+                    <p style="margin-bottom: 20px; color: var(--text-muted);">
+                        前回同期していたファイルが見つかりました。<br>
+                        このファイルで同期を再開しますか？
+                    </p>
+                    <div
+                        style="font-weight: 600; font-size: 1.1rem; color: var(--primary-color); padding: 12px; background: var(--table-hover-bg); border-radius: var(--radius-md); display: inline-block; margin-bottom: 24px;">
+                        📄 <span id="startup-filename-text">filename.json</span>
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 16px;">
+                        <button type="button" class="btn btn-primary" id="btn-startup-resume">はい、再開する</button>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 24px 0;">
+                </div>
+
+                <p style="margin-bottom: 20px; color: var(--text-muted);" id="startup-desc-text">
+                    データの保存先（JSONファイル）を選択してください。<br>
+                    <small>※ブラウザ上だけでの作業はデータ消失のリスクがあるため推奨していませんが、<br>スマホ等の環境では「ブラウザのみで利用」を選択してください。</small>
+                </p>
+                <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-outline" id="btn-startup-new">新規ファイルを作成...</button>
+                    <button type="button" class="btn btn-outline" id="btn-startup-open">既存ファイルを開く...</button>
+                    <button type="button" class="btn btn-secondary" id="btn-startup-browser-only">ブラウザのみで利用（同期なし）</button>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 24px 0;">
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">メッセージ</div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
