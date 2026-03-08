@@ -500,40 +500,24 @@ class UIController {
         const storedHandle = await this.storage.loadStoredFileHandle();
         const startupModal = document.getElementById('modal-startup');
         
-        // Auto-login logic
-        if (this.storage.ghSettings.enabled && this.storage.ghSettings.token) {
-            // Setup Loading UI
-            document.getElementById('startup-device-selection').style.display = 'none';
-            document.getElementById('startup-options-pc').style.display = 'none';
-            document.getElementById('startup-loading').style.display = 'block';
-            document.getElementById('startup-modal-title').textContent = 'クラウド同期';
-            startupModal.classList.add('active');
-            
-            if (await this.storage.loadDataFromGitHub()) {
-                startupModal.classList.remove('active');
-                this.refreshAllViews();
-                this.showToast('GitHubからデータを同期しました');
-            } else {
-                // Restore UI if failed
-                document.getElementById('startup-device-selection').style.display = 'block';
-                document.getElementById('startup-options-pc').style.display = 'none';
-                document.getElementById('startup-loading').style.display = 'none';
-                document.getElementById('startup-modal-title').textContent = '利用する端末の選択';
-                alert('GitHubからのデータ取得に失敗しました。設定を確認してください。');
-                this.storage.saveGitHubSettings({ enabled: false });
+        // Auto-login logic disabled per user request: Always show device selection first
+        document.getElementById('startup-device-selection').style.display = 'block';
+        document.getElementById('startup-options-pc').style.display = 'none';
+        
+        const loadingEl = document.getElementById('startup-loading');
+        if(loadingEl) loadingEl.style.display = 'none';
+
+        startupModal.classList.add('active');
+
+        if (storedHandle) {
+            const hasFileEl = document.getElementById('startup-has-file');
+            if (hasFileEl) {
+                hasFileEl.style.display = 'block';
+                document.getElementById('startup-filename-text').textContent = storedHandle.name;
             }
         } else {
-            // Show device selection if no auto-login
-            document.getElementById('startup-device-selection').style.display = 'block';
-            document.getElementById('startup-options-pc').style.display = 'none';
-            startupModal.classList.add('active');
-            
-            if (storedHandle) {
-                document.getElementById('startup-has-file').style.display = 'block';
-                document.getElementById('startup-filename-text').textContent = storedHandle.name;
-            } else {
-                document.getElementById('startup-has-file').style.display = 'none';
-            }
+            const hasFileEl = document.getElementById('startup-has-file');
+            if (hasFileEl) hasFileEl.style.display = 'none';
         }
     }
 
@@ -919,6 +903,11 @@ class UIController {
             cell.className = 'calendar-cell';
             if (currentCellDate.getMonth() !== month) cell.classList.add('other-month');
             if (dateStr === todayStr) cell.classList.add('today');
+
+            // Add weekend classes for styling
+            const dayOfWeek = currentCellDate.getDay();
+            if (dayOfWeek === 0) cell.classList.add('sunday');
+            if (dayOfWeek === 6) cell.classList.add('saturday');
 
             // Top section: Date number and + button
             const cellTop = document.createElement('div');

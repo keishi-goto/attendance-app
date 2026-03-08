@@ -421,6 +421,20 @@ select:focus {
     background-color: rgba(52, 211, 153, 0.1);
 }
 
+.calendar-cell.saturday {
+    background-color: rgba(96, 165, 250, 0.1);
+}
+.calendar-cell.saturday .cell-date {
+    color: #93c5fd;
+}
+
+.calendar-cell.sunday {
+    background-color: rgba(248, 113, 113, 0.1);
+}
+.calendar-cell.sunday .cell-date {
+    color: #fca5a5;
+}
+
 .cell-top {
     display: flex;
     justify-content: space-between;
@@ -972,7 +986,7 @@ select:focus {
     .content-area {
         order: 1;
         padding: 16px;
-        padding-bottom: 80px; /* Safe space for bottom tab bar */
+        padding-bottom: 120px; /* Safe space for bottom tab bar + extra scrolling */
         height: 100vh;
     }
 
@@ -989,6 +1003,7 @@ select:focus {
         flex: 1;
         overflow-y: auto;
         padding: 16px;
+        padding-bottom: 120px; /* Ensure last element is fully visible above tab bar */
     }
     .table-container.scrollable {
         max-height: none !important;
@@ -1035,35 +1050,77 @@ select:focus {
         border-radius: var(--radius-md);
     }
 
-    /* Calendar View on Mobile */
-    .calendar-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        padding-bottom: 24px;
+    /* Calendar View on Mobile - Forced 7 Grid */
+    .calendar-body {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-auto-rows: minmax(60px, auto);
+        gap: 2px;
+        padding-bottom: 32px;
     }
     .calendar-cell {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start;
         min-height: 60px;
-        padding: 12px 16px;
-        border-radius: var(--radius-md);
+        padding: 4px;
+        border-radius: var(--radius-sm);
         border: 1px solid var(--border-color);
     }
-    .calendar-cell .date-num {
+    .calendar-cell.other-month {
+        display: flex;
+    }
+    .cell-top {
+        margin-bottom: 4px;
+        justify-content: center;
+        width: 100%;
+    }
+    .cell-date {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    .btn-add-attendance {
+        display: none; /* Hide + button on narrow mobile grid */
+    }
+    
+    .cell-badges {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+    }
+    .attendance-badge {
+        /* Hide text on mobile, just show colored squares/dots */
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        padding: 0;
+        border: none !important;
+        font-size: 0; /* Hide text */
         display: inline-block;
-        margin-right: 16px;
-        font-weight: 600;
-        font-size: 1.1rem;
+        color: transparent;
     }
-    .calendar-cell .att-count {
-        margin-top: 0;
-        text-align: right;
+    
+    /* Apply background colors since text is hidden */
+    .attendance-badge[data-period="1限"] { background-color: #f87171; }
+    .attendance-badge[data-period="2限"] { background-color: #fb923c; }
+    .attendance-badge[data-period="3限"] { background-color: #fbbf24; }
+    .attendance-badge[data-period="4限"] { background-color: #a3e635; }
+    .attendance-badge[data-period="5限"] { background-color: #34d399; }
+    .attendance-badge[data-period="6限"] { background-color: #22d3ee; }
+    .attendance-badge[data-period="7限"] { background-color: #60a5fa; }
+    .attendance-badge[data-period="放課後"] { background-color: #a78bfa; }
+
+    .calendar-header { 
+        display: grid; 
+        grid-template-columns: repeat(7, 1fr);
     }
-    .calendar-cell.empty { display: none; }
-    .calendar-header { display: none; }
+    .calendar-header div {
+        padding: 4px;
+        font-size: 0.7rem;
+    }
     
     .table-container table {
         display: block;
