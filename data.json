@@ -23,6 +23,30 @@
           "status": "通常"
         }
       ]
+    },
+    {
+      "id": "_lcky86uzu",
+      "name": "1-2",
+      "students": [
+        {
+          "id": "_tjxr9jmbz",
+          "number": 1,
+          "name": "佐藤",
+          "status": "通常"
+        },
+        {
+          "id": "_afn1m55f2",
+          "number": 2,
+          "name": "後藤",
+          "status": "通常"
+        },
+        {
+          "id": "_srmnt1pjz",
+          "number": 3,
+          "name": "権藤",
+          "status": "通常"
+        }
+      ]
     }
   ],
   "attendance": {
