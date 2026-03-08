@@ -554,6 +554,7 @@ select:focus {
 .data-table td {
     padding: 14px 16px;
     border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
 }
 
 .data-table th {

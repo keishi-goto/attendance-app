@@ -912,10 +912,17 @@ class UIController {
             // Top section: Date number and + button
             const cellTop = document.createElement('div');
             cellTop.className = 'cell-top';
+            cellTop.style.cursor = 'pointer'; // Make it obvious it's clickable
             cellTop.innerHTML = `
                 <span class="cell-date">${currentCellDate.getDate()}</span>
                 <button class="btn-add-attendance" title="出欠を登録する" data-date="${dateStr}">+</button>
             `;
+            
+            // Allow tapping the date number area to add attendance (especially for mobile where + is hidden)
+            cellTop.addEventListener('click', () => {
+                this.openAttendanceModal(dateStr, null);
+            });
+            
             cell.appendChild(cellTop);
 
             // Badges section
