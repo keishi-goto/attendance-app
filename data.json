@@ -19,5 +19,15 @@
       ]
     }
   ],
-  "attendance": {}
+  "attendance": {
+    "2026-03-01": {
+      "1限": {
+        "classId": "_ja3ngxxun",
+        "records": {
+          "_vvd7l42eq": "欠席",
+          "_qoguorfly": "出席"
+        }
+      }
+    }
+  }
 }
