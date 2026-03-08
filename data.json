@@ -1,0 +1,23 @@
+{
+  "classes": [
+    {
+      "id": "_ja3ngxxun",
+      "name": "1-1",
+      "students": [
+        {
+          "id": "_vvd7l42eq",
+          "number": 1,
+          "name": "田中",
+          "status": "通常"
+        },
+        {
+          "id": "_qoguorfly",
+          "number": 2,
+          "name": "佐藤",
+          "status": "通常"
+        }
+      ]
+    }
+  ],
+  "attendance": {}
+}
