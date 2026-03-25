@@ -1,4 +1,203 @@
 {
-  "classes": [],
+  "classes": [
+    {
+      "id": "_vy8gr4uhu",
+      "name": "F1-4_数学Ⅰ",
+      "students": [
+        {
+          "id": "_l3toiue28",
+          "number": 1,
+          "name": "阿部　那美",
+          "status": "通常"
+        },
+        {
+          "id": "_6gy3ej6sf",
+          "number": 2,
+          "name": "石川　心結",
+          "status": "通常"
+        },
+        {
+          "id": "_69robsp5i",
+          "number": 3,
+          "name": "一ノ宮　奈々",
+          "status": "通常"
+        },
+        {
+          "id": "_xdsbrn0t4",
+          "number": 4,
+          "name": "伊藤　大輝",
+          "status": "通常"
+        },
+        {
+          "id": "_vhxgx5xlp",
+          "number": 5,
+          "name": "采井　志保里",
+          "status": "通常"
+        },
+        {
+          "id": "_v9v79z5di",
+          "number": 6,
+          "name": "江﨑　加奈",
+          "status": "通常"
+        },
+        {
+          "id": "_r3zakhtmu",
+          "number": 7,
+          "name": "大野　未海",
+          "status": "通常"
+        },
+        {
+          "id": "_0l5fafm9e",
+          "number": 8,
+          "name": "菊原　佑樹",
+          "status": "通常"
+        },
+        {
+          "id": "_mam14g1kv",
+          "number": 9,
+          "name": "木寺　結月",
+          "status": "通常"
+        },
+        {
+          "id": "_kd88sjtfk",
+          "number": 10,
+          "name": "古賀　リリィ法華",
+          "status": "通常"
+        },
+        {
+          "id": "_2x1rz7rg2",
+          "number": 11,
+          "name": "國生　拓史",
+          "status": "通常"
+        },
+        {
+          "id": "_ntl0351gk",
+          "number": 12,
+          "name": "小杉　朝登",
+          "status": "通常"
+        },
+        {
+          "id": "_n0d37ar68",
+          "number": 13,
+          "name": "佐藤󠄃　颯音",
+          "status": "通常"
+        },
+        {
+          "id": "_oq5aaq351",
+          "number": 14,
+          "name": "島本　紗良",
+          "status": "通常"
+        },
+        {
+          "id": "_22bgpfjjm",
+          "number": 15,
+          "name": "髙瀬　知花",
+          "status": "通常"
+        },
+        {
+          "id": "_6xifa3tkl",
+          "number": 16,
+          "name": "髙辻󠄂　知哉",
+          "status": "通常"
+        },
+        {
+          "id": "_rf553ysi6",
+          "number": 17,
+          "name": "田平　竜聖",
+          "status": "通常"
+        },
+        {
+          "id": "_0uh5nqfij",
+          "number": 18,
+          "name": "築井　佐奈",
+          "status": "通常"
+        },
+        {
+          "id": "_5jn9nmv8h",
+          "number": 19,
+          "name": "張　景鈞",
+          "status": "通常"
+        },
+        {
+          "id": "_gbns5t6t3",
+          "number": 20,
+          "name": "千代丸　航也",
+          "status": "通常"
+        },
+        {
+          "id": "_zb2wb9p59",
+          "number": 21,
+          "name": "津留崎　康介",
+          "status": "通常"
+        },
+        {
+          "id": "_5ymxvb7ap",
+          "number": 22,
+          "name": "中嶋　紗己",
+          "status": "通常"
+        },
+        {
+          "id": "_tl4n98f21",
+          "number": 23,
+          "name": "永利　瑠子",
+          "status": "通常"
+        },
+        {
+          "id": "_cwa873rgw",
+          "number": 24,
+          "name": "中村　暢希",
+          "status": "通常"
+        },
+        {
+          "id": "_5o260888t",
+          "number": 25,
+          "name": "永吉　真徳",
+          "status": "通常"
+        },
+        {
+          "id": "_nxb7a2wni",
+          "number": 26,
+          "name": "西堀　友彩",
+          "status": "通常"
+        },
+        {
+          "id": "_b7smwutob",
+          "number": 27,
+          "name": "桝﨑　凜夏",
+          "status": "通常"
+        },
+        {
+          "id": "_an8ohmrww",
+          "number": 28,
+          "name": "松田　南美",
+          "status": "通常"
+        },
+        {
+          "id": "_ni24zstjq",
+          "number": 29,
+          "name": "馬城　凛之介",
+          "status": "通常"
+        },
+        {
+          "id": "_hn0xk80j2",
+          "number": 30,
+          "name": "森　颯花",
+          "status": "通常"
+        },
+        {
+          "id": "_dpqy0tn41",
+          "number": 31,
+          "name": "安川　綾乃",
+          "status": "通常"
+        },
+        {
+          "id": "_4k0731xq1",
+          "number": 32,
+          "name": "山内　蒼惟",
+          "status": "通常"
+        }
+      ]
+    }
+  ],
   "attendance": {}
 }
