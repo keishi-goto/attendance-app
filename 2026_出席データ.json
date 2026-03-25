@@ -827,6 +827,180 @@
           "status": "通常"
         }
       ]
+    },
+    {
+      "id": "_il3skec1w",
+      "name": "J1-B_数学",
+      "students": [
+        {
+          "id": "_cjx6kovmn",
+          "number": 1,
+          "name": "赤木　輝",
+          "status": "通常"
+        },
+        {
+          "id": "_fw5lnju8m",
+          "number": 2,
+          "name": "天野　葉月",
+          "status": "通常"
+        },
+        {
+          "id": "_9lvxl1q88",
+          "number": 3,
+          "name": "伊奈　あさひ",
+          "status": "通常"
+        },
+        {
+          "id": "_b0fkdgw8j",
+          "number": 4,
+          "name": "猪股　珠丸",
+          "status": "通常"
+        },
+        {
+          "id": "_ucekbebi0",
+          "number": 5,
+          "name": "岩田　希春",
+          "status": "通常"
+        },
+        {
+          "id": "_64nb9gowc",
+          "number": 6,
+          "name": "大園　心友",
+          "status": "通常"
+        },
+        {
+          "id": "_ujqnn3tqx",
+          "number": 7,
+          "name": "蒲池　隼仁",
+          "status": "通常"
+        },
+        {
+          "id": "_33ybkboyp",
+          "number": 8,
+          "name": "児玉　あゆな",
+          "status": "通常"
+        },
+        {
+          "id": "_wqoyw8m3n",
+          "number": 9,
+          "name": "坂口　こころ",
+          "status": "通常"
+        },
+        {
+          "id": "_115v9luo5",
+          "number": 10,
+          "name": "酒見　唯衣",
+          "status": "通常"
+        },
+        {
+          "id": "_kmjl2ywz9",
+          "number": 11,
+          "name": "迫田　航典",
+          "status": "通常"
+        },
+        {
+          "id": "_444qu7ths",
+          "number": 12,
+          "name": "佐藤　杏莉",
+          "status": "通常"
+        },
+        {
+          "id": "_8m0plraxy",
+          "number": 13,
+          "name": "重松　圭人",
+          "status": "通常"
+        },
+        {
+          "id": "_eyvvd1e86",
+          "number": 14,
+          "name": "末永　悠仁",
+          "status": "通常"
+        },
+        {
+          "id": "_lsfkt2gsn",
+          "number": 15,
+          "name": "竹内　直緒",
+          "status": "通常"
+        },
+        {
+          "id": "_arcqkkucr",
+          "number": 16,
+          "name": "谷口　碧",
+          "status": "通常"
+        },
+        {
+          "id": "_z5mp9j5ti",
+          "number": 17,
+          "name": "德永　悠樹",
+          "status": "通常"
+        },
+        {
+          "id": "_hvz9l5i2m",
+          "number": 18,
+          "name": "中村　優斗",
+          "status": "通常"
+        },
+        {
+          "id": "_5wytz1519",
+          "number": 19,
+          "name": "林　優月",
+          "status": "通常"
+        },
+        {
+          "id": "_q04ikldbs",
+          "number": 20,
+          "name": "平瀬　未悠",
+          "status": "通常"
+        },
+        {
+          "id": "_yh8cnh8dp",
+          "number": 21,
+          "name": "平山　廉",
+          "status": "通常"
+        },
+        {
+          "id": "_65uqwivq2",
+          "number": 22,
+          "name": "二場　安之助",
+          "status": "通常"
+        },
+        {
+          "id": "_zl3sljyc9",
+          "number": 23,
+          "name": "松藤　美梨愛",
+          "status": "通常"
+        },
+        {
+          "id": "_l8uquve0p",
+          "number": 24,
+          "name": "村井　善哉",
+          "status": "通常"
+        },
+        {
+          "id": "_bzm0yb2tr",
+          "number": 25,
+          "name": "目野　悠翔",
+          "status": "通常"
+        },
+        {
+          "id": "_q7xx6mveq",
+          "number": 26,
+          "name": "籾井　日奈乃",
+          "status": "通常"
+        },
+        {
+          "id": "_h8mzktl33",
+          "number": 27,
+          "name": "山内　蒼真",
+          "status": "通常"
+        },
+        {
+          "id": "_n1nxr5nho",
+          "number": 28,
+          "name": "山﨑　祐生",
+          "status": "通常"
+        }
+      ]
     }
   ],
   "attendance": {}
