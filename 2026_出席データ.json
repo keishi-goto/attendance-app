@@ -1003,45 +1003,5 @@
       ]
     }
   ],
-  "attendance": {
-    "2026-04-08": {
-      "1限": {
-        "classId": "_vy8gr4uhu",
-        "records": {
-          "_l3toiue28": "出席",
-          "_6gy3ej6sf": "出席",
-          "_69robsp5i": "出席",
-          "_xdsbrn0t4": "出席",
-          "_vhxgx5xlp": "出席",
-          "_v9v79z5di": "出席",
-          "_r3zakhtmu": "出席",
-          "_0l5fafm9e": "出席",
-          "_mam14g1kv": "出席",
-          "_kd88sjtfk": "出席",
-          "_2x1rz7rg2": "出席",
-          "_ntl0351gk": "出席",
-          "_n0d37ar68": "出席",
-          "_oq5aaq351": "出席",
-          "_22bgpfjjm": "出席",
-          "_6xifa3tkl": "出席",
-          "_rf553ysi6": "出席",
-          "_0uh5nqfij": "出席",
-          "_5jn9nmv8h": "出席",
-          "_gbns5t6t3": "出席",
-          "_zb2wb9p59": "出席",
-          "_5ymxvb7ap": "出席",
-          "_tl4n98f21": "出席",
-          "_cwa873rgw": "出席",
-          "_5o260888t": "出席",
-          "_nxb7a2wni": "出席",
-          "_b7smwutob": "出席",
-          "_an8ohmrww": "出席",
-          "_ni24zstjq": "出席",
-          "_hn0xk80j2": "出席",
-          "_dpqy0tn41": "出席",
-          "_4k0731xq1": "欠席"
-        }
-      }
-    }
-  }
+  "attendance": {}
 }
